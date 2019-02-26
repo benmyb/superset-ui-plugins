@@ -2,14 +2,15 @@ import React from 'react';
 import { CategoricalColorNamespace } from '@superset-ui/color';
 import { LegendOrdinal, LegendItem, LegendLabel } from '@vx/legend';
 import { scaleOrdinal } from '@vx/scale';
+import { get } from 'lodash';
 
 export default function renderLegend(data, colorEncoding) {
-  const { accessor, field, scale } = colorEncoding;
+  const { field, scale } = colorEncoding;
   const { scheme, namespace } = scale;
   const colorFn = CategoricalColorNamespace.getScale(scheme, namespace);
   const keySet = new Set();
   data.forEach(d => {
-    keySet.add(accessor ? accessor(d) : d[field]);
+    keySet.add(get(d, field));
   });
   const keys = [...keySet.values()];
   const colorScale = scaleOrdinal({

@@ -23,6 +23,7 @@ import { LineSeries, XYChart } from '@data-ui/xy-chart';
 import { themeShape } from '@data-ui/xy-chart/esm/utils/propShapes';
 import { chartTheme } from '@data-ui/theme';
 import { CategoricalColorNamespace } from '@superset-ui/color';
+import { get } from 'lodash';
 import createTooltip from './createTooltip';
 import renderLegend from '../utils/renderLegend';
 import XYChartLayout from '../utils/XYChartLayout';
@@ -79,14 +80,12 @@ class LineChart extends React.PureComponent {
       encoding.color.scale.namespace,
     );
 
-    const colorAccessor = encoding.color.accessor;
-
     const children = data.map(series => (
       <LineSeries
-        key={series.key.join('/')}
+        key={get(series, encoding.color.field)}
         animated
         data={series.values}
-        stroke={colorFn(colorAccessor(series))}
+        stroke={colorFn(get(series, encoding.color.field))}
         strokeWidth={1.5}
       />
     ));

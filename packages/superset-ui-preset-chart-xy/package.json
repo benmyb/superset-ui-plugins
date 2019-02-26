@@ -36,6 +36,7 @@
     "@vx/shape": "^0.0.184",
     "@vx/scale": "^0.0.182",
     "d3-array": "^2.0.3",
+    "lodash": "^4.17.11",
     "prop-types": "^15.6.2"
   },
   "peerDependencies": {
