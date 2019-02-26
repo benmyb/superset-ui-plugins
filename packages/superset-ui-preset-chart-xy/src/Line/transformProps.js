@@ -23,7 +23,7 @@ export default function transformProps(chartProps) {
         axis: {
           orientation: 'bottom',
           label: xAxisLabel,
-          numTicks: 5,
+          // numTicks: 5,
           tickFormat: getTimeFormatter(xAxisFormat),
         },
       },

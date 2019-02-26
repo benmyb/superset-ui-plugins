@@ -5,8 +5,9 @@ import data from './data';
 
 export default [
   {
-    renderStory: () => (
+    renderStory: () => [
       <SuperChart
+        key="line1"
         chartType="line2"
         chartProps={{
           datasource: { verboseMap: {} },
@@ -34,8 +35,38 @@ export default [
           payload: { data },
           width: 400,
         }}
-      />
-    ),
+      />,
+      <SuperChart
+        key="line2"
+        chartType="line2"
+        chartProps={{
+          datasource: { verboseMap: {} },
+          formData: {
+            bottomMargin: 'auto',
+            colorScheme: 'd3Category10',
+            leftMargin: 'auto',
+            lineInterpolation: 'linear',
+            richTooltip: true,
+            showBrush: 'auto',
+            showLegend: true,
+            showMarkers: false,
+            vizType: 'line',
+            xAxisFormat: '%Y-%m',
+            xAxisLabel: '',
+            xAxisShowminmax: false,
+            xTicksLayout: 'auto',
+            yAxisBounds: [null, null],
+            yAxisFormat: '.3s',
+            yAxisLabel: '',
+            yAxisShowminmax: false,
+            yLogScale: false,
+          },
+          height: 400,
+          payload: { data },
+          width: 800,
+        }}
+      />,
+    ],
     storyName: 'Basic',
     storyPath: 'preset-chart-xy|LineChartPlugin',
   },

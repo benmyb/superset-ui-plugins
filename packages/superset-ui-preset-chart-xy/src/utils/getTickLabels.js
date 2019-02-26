@@ -2,7 +2,7 @@
 import identity from '@vx/axis/build/utils/identity';
 
 export default function getTickLabels(scale, axisConfig) {
-  const { numTicks = 10, tickValues, tickFormat } = axisConfig;
+  const { numTicks = 5, tickValues, tickFormat } = axisConfig;
   let values = scale.ticks ? scale.ticks(numTicks) : scale.domain();
   if (tickValues) values = tickValues;
 

@@ -19,7 +19,7 @@
 /* eslint-disable sort-keys, no-magic-numbers, complexity */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LineSeries, XYChart } from '@data-ui/xy-chart';
+import { LineSeries, XYChart, CrossHair } from '@data-ui/xy-chart';
 import { themeShape } from '@data-ui/xy-chart/esm/utils/propShapes';
 import { chartTheme } from '@data-ui/theme';
 import { CategoricalColorNamespace } from '@superset-ui/color';
@@ -98,9 +98,10 @@ class LineChart extends React.PureComponent {
         height={dim.height}
         ariaLabel="BoxPlot"
         margin={layout.margin}
+        eventTrigger="container"
         renderTooltip={createTooltip(encoding.y.axis.tickFormat)}
         showYGrid
-        // snapTooltipToDataX
+        snapTooltipToDataX
         theme={config.theme}
         xScale={config.encoding.x.scale}
         yScale={config.encoding.y.scale}
@@ -108,6 +109,16 @@ class LineChart extends React.PureComponent {
         {children}
         {layout.createXAxis()}
         {layout.createYAxis()}
+        <CrossHair
+          fullHeight
+          strokeDasharray=""
+          showHorizontalLine={false}
+          circleFill="white"
+          circleStroke="black"
+          stroke="black"
+          showCircle
+          showMultipleCircles
+        />
       </XYChart>
     ));
   }
