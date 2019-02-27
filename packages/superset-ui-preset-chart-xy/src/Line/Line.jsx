@@ -19,11 +19,18 @@
 /* eslint-disable sort-keys, no-magic-numbers, complexity */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LineSeries, XYChart, CrossHair, WithTooltip } from '@data-ui/xy-chart';
+import {
+  AreaSeries,
+  LinearGradient,
+  LineSeries,
+  XYChart,
+  CrossHair,
+  WithTooltip,
+} from '@data-ui/xy-chart';
 import { themeShape } from '@data-ui/xy-chart/esm/utils/propShapes';
 import { chartTheme } from '@data-ui/theme';
 import { CategoricalColorNamespace } from '@superset-ui/color';
-import { flatMap, get } from 'lodash';
+import { flatMap, get, uniqueId } from 'lodash';
 import createTooltip from './createTooltip';
 import renderLegend from '../utils/renderLegend';
 import XYChartLayout from '../utils/XYChartLayout';
@@ -36,7 +43,12 @@ const propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.number),
+      values: PropTypes.arrayOf(
+        PropTypes.shape({
+          x: PropTypes.number,
+          y: PropTypes.number,
+        }),
+      ),
     }),
   ).isRequired,
   width: PropTypes.number.isRequired,
@@ -86,6 +98,7 @@ class LineChart extends React.PureComponent {
       return {
         ...series,
         color,
+        fill: series.fields.name === 'David',
         values: series.values.map(v => ({
           ...v,
           color,
@@ -93,16 +106,40 @@ class LineChart extends React.PureComponent {
       };
     });
 
-    const children = encodedData.map(series => (
-      <LineSeries
-        key={series.seriesKey}
-        seriesKey={series.seriesKey}
-        animated
-        data={series.values}
-        stroke={series.color}
-        strokeWidth={1.5}
-      />
-    ));
+    const children = flatMap(
+      encodedData
+        .filter(series => series.fill)
+        .map(series => {
+          const gradientId = uniqueId(`gradient-${series.seriesKey}`);
+
+          return [
+            <LinearGradient
+              key={`${series.seriesKey}-gradient`}
+              id={gradientId}
+              from={series.color}
+              to="#fff"
+            />,
+            <AreaSeries
+              key={`${series.seriesKey}-fill`}
+              data={series.values}
+              fill={`url(#${gradientId})`}
+              stroke={series.color}
+            />,
+          ];
+        }),
+    ).concat(
+      encodedData.map(series => (
+        <LineSeries
+          key={series.seriesKey}
+          seriesKey={series.seriesKey}
+          animated
+          data={series.values}
+          stroke={series.color}
+          strokeDasharray={series.strokeDasharray}
+          strokeWidth={1.5}
+        />
+      )),
+    );
 
     const layout = new XYChartLayout({ ...spec, children });
 
