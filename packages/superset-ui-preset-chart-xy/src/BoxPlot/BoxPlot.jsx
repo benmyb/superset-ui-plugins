@@ -66,7 +66,7 @@ class BoxPlot extends React.PureComponent {
   renderChart({ width, height }) {
     const { data, encoding, margin, theme, isHorizontal } = this.props;
 
-    const config = {
+    const spec = {
       width,
       height,
       minContentWidth: 0,
@@ -107,7 +107,7 @@ class BoxPlot extends React.PureComponent {
       />,
     ];
 
-    const layout = new XYChartLayout({ ...config, children });
+    const layout = new XYChartLayout({ ...spec, children });
 
     return layout.createChartWithFrame(dim => (
       <XYChart
@@ -117,9 +117,9 @@ class BoxPlot extends React.PureComponent {
         margin={layout.margin}
         renderTooltip={createTooltip(encoding.y.axis.tickFormat)}
         showYGrid
-        theme={config.theme}
-        xScale={config.encoding.x.scale}
-        yScale={config.encoding.y.scale}
+        theme={spec.theme}
+        xScale={spec.encoding.x.scale}
+        yScale={spec.encoding.y.scale}
       >
         {children}
         {layout.createXAxis()}

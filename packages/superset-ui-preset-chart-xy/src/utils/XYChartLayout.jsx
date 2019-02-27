@@ -14,8 +14,8 @@ import ChartFrame from '../components/ChartFrame';
 const OVERFLOW_MARGIN = 8;
 
 export default class XYChartLayout {
-  constructor(config) {
-    this.config = config;
+  constructor(spec) {
+    this.spec = spec;
 
     const {
       width,
@@ -26,7 +26,7 @@ export default class XYChartLayout {
       encoding,
       children,
       theme,
-    } = config;
+    } = spec;
     const { x, y } = encoding;
 
     const { xScale, yScale } = collectScalesFromProps({
@@ -109,7 +109,7 @@ export default class XYChartLayout {
   }
 
   createXAxis(props) {
-    const { axis } = this.config.encoding.x;
+    const { axis } = this.spec.encoding.x;
 
     return (
       <XAxis
@@ -124,7 +124,7 @@ export default class XYChartLayout {
   }
 
   createYAxis(props) {
-    const { axis } = this.config.encoding.y;
+    const { axis } = this.spec.encoding.y;
 
     return (
       <YAxis

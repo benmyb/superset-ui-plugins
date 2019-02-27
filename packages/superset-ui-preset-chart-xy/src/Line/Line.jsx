@@ -19,11 +19,11 @@
 /* eslint-disable sort-keys, no-magic-numbers, complexity */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LineSeries, XYChart, CrossHair } from '@data-ui/xy-chart';
+import { LineSeries, XYChart, CrossHair, WithTooltip } from '@data-ui/xy-chart';
 import { themeShape } from '@data-ui/xy-chart/esm/utils/propShapes';
 import { chartTheme } from '@data-ui/theme';
 import { CategoricalColorNamespace } from '@superset-ui/color';
-import { get } from 'lodash';
+import { flatMap, get } from 'lodash';
 import createTooltip from './createTooltip';
 import renderLegend from '../utils/renderLegend';
 import XYChartLayout from '../utils/XYChartLayout';
@@ -57,7 +57,7 @@ const propTypes = {
 
 const defaultProps = {
   className: '',
-  margin: { top: 10, right: 10, left: 10, bottom: 10 },
+  margin: { top: 20, right: 20, left: 20, bottom: 20 },
   theme: chartTheme,
 };
 
@@ -65,7 +65,7 @@ class LineChart extends React.PureComponent {
   renderChart({ width, height }) {
     const { data, encoding, margin, theme } = this.props;
 
-    const config = {
+    const spec = {
       width,
       height,
       minContentWidth: 0,
@@ -80,46 +80,69 @@ class LineChart extends React.PureComponent {
       encoding.color.scale.namespace,
     );
 
-    const children = data.map(series => (
+    const encodedData = data.map(series => {
+      const color = colorFn(get(series, encoding.color.field));
+
+      return {
+        ...series,
+        color,
+        values: series.values.map(v => ({
+          ...v,
+          color,
+        })),
+      };
+    });
+
+    const children = encodedData.map(series => (
       <LineSeries
-        key={get(series, encoding.color.field)}
+        key={series.seriesKey}
+        seriesKey={series.seriesKey}
         animated
         data={series.values}
-        stroke={colorFn(get(series, encoding.color.field))}
+        stroke={series.color}
         strokeWidth={1.5}
       />
     ));
 
-    const layout = new XYChartLayout({ ...config, children });
+    const layout = new XYChartLayout({ ...spec, children });
 
     return layout.createChartWithFrame(dim => (
-      <XYChart
-        width={dim.width}
-        height={dim.height}
-        ariaLabel="BoxPlot"
-        margin={layout.margin}
-        eventTrigger="container"
-        renderTooltip={createTooltip(encoding.y.axis.tickFormat)}
-        showYGrid
-        snapTooltipToDataX
-        theme={config.theme}
-        xScale={config.encoding.x.scale}
-        yScale={config.encoding.y.scale}
-      >
-        {children}
-        {layout.createXAxis()}
-        {layout.createYAxis()}
-        <CrossHair
-          fullHeight
-          strokeDasharray=""
-          showHorizontalLine={false}
-          circleFill="white"
-          circleStroke="black"
-          stroke="black"
-          showCircle
-          showMultipleCircles
-        />
-      </XYChart>
+      <WithTooltip renderTooltip={createTooltip(spec, encodedData)}>
+        {({ onMouseLeave, onMouseMove, tooltipData }) => (
+          <XYChart
+            width={dim.width}
+            height={dim.height}
+            ariaLabel="BoxPlot"
+            margin={layout.margin}
+            eventTrigger="container"
+            onMouseMove={onMouseMove}
+            onMouseLeave={onMouseLeave}
+            renderTooltip={null}
+            showYGrid
+            snapTooltipToDataX
+            theme={spec.theme}
+            tooltipData={tooltipData}
+            xScale={spec.encoding.x.scale}
+            yScale={spec.encoding.y.scale}
+          >
+            {children}
+            {layout.createXAxis()}
+            {layout.createYAxis()}
+            <CrossHair
+              fullHeight
+              strokeDasharray=""
+              showHorizontalLine={false}
+              circleFill={d => (d.y === tooltipData.datum.y ? d.color : '#fff')}
+              circleSize={d => (d.y === tooltipData.datum.y ? 6 : 4)}
+              circleStroke={d => (d.y === tooltipData.datum.y ? '#fff' : d.color)}
+              circleStyles={{ strokeWidth: 1.5 }}
+              stroke="#ccc"
+              showCircle
+              showMultipleCircles
+            />
+          </XYChart>
+        )}
+      </WithTooltip>
     ));
   }
 

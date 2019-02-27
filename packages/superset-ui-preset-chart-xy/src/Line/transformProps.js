@@ -8,10 +8,18 @@ export default function transformProps(chartProps) {
   const { colorScheme, xAxisLabel, xAxisFormat, yAxisLabel, yAxisFormat } = formData;
 
   return {
-    data: payload.data.map(({ key, values }) => ({
-      key: { name: key[0] },
-      values,
-    })),
+    data: payload.data.map(({ key, values }) => {
+      const fields = { name: key[0] };
+
+      return {
+        seriesKey: key.join('/'),
+        fields,
+        values: values.map(v => ({
+          ...v,
+          // y: Math.random() < 0.1 ? null : v.y,
+        })),
+      };
+    }),
     width,
     height,
     encoding: {
@@ -39,7 +47,7 @@ export default function transformProps(chartProps) {
         },
       },
       color: {
-        field: 'key.name',
+        field: 'fields.name',
         scale: {
           scheme: colorScheme,
         },
