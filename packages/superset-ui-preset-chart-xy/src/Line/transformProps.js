@@ -6,24 +6,31 @@ import { getTimeFormatter } from '@superset-ui/time-format';
 export default function transformProps(chartProps) {
   const { width, height, formData, payload } = chartProps;
   const { encoding } = formData;
+  const { data } = payload;
 
   // hack
   encoding.x.axis.tickFormat = getTimeFormatter(encoding.x.axis.tickFormat);
   encoding.y.axis.tickFormat = getNumberFormatter(encoding.y.axis.tickFormat);
 
-  return {
-    data: payload.data.map(({ key, values }) => {
-      const fields = { name: key[0] };
+  const keySet = new Set();
+  if (data && data.length > 0) {
+    payload.data.forEach(({ keys }) => {
+      Object.keys(keys).forEach(k => {
+        keySet.add(k);
+      });
+    });
+  }
+  const fieldNames = [...keySet.values()].sort((a, b) => a.localeCompare(b));
 
-      return {
-        seriesKey: key.join('/'),
-        fields,
-        values: values.map(v => ({
-          ...v,
-          // y: Math.random() < 0.1 ? null : v.y,
-        })),
-      };
-    }),
+  return {
+    data: data.map(({ keys, values }) => ({
+      seriesKey: fieldNames.map(f => keys[f]).join('/'),
+      keys,
+      values: values.map(v => ({
+        ...v,
+        // y: Math.random() < 0.1 ? null : v.y,
+      })),
+    })),
     width,
     height,
     encoding,

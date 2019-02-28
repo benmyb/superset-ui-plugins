@@ -1,9 +1,7 @@
 /* eslint-disable sort-keys, no-magic-numbers */
 export default [
   {
-    keys: {
-      name: 'Christopher',
-    },
+    key: ['Christopher'],
     values: [
       {
         x: -157766400000.0,
@@ -184,9 +182,7 @@ export default [
     ],
   },
   {
-    keys: {
-      name: 'David',
-    },
+    key: ['David'],
     values: [
       {
         x: -157766400000.0,
@@ -367,9 +363,7 @@ export default [
     ],
   },
   {
-    keys: {
-      name: 'James',
-    },
+    key: ['James'],
     values: [
       {
         x: -157766400000.0,
@@ -550,9 +544,7 @@ export default [
     ],
   },
   {
-    keys: {
-      name: 'John',
-    },
+    key: ['John'],
     values: [
       {
         x: -157766400000.0,
@@ -733,9 +725,7 @@ export default [
     ],
   },
   {
-    keys: {
-      name: 'Michael',
-    },
+    key: ['Michael'],
     values: [
       {
         x: -157766400000.0,

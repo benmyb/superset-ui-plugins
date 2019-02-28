@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers, sort-keys */
 import React from 'react';
 import { SuperChart } from '@superset-ui/chart';
-import data from './data';
+import data from './data2';
 
 export default [
   {
@@ -38,10 +38,30 @@ export default [
                 },
               },
               color: {
-                field: 'name',
+                value: '#1abc9c',
                 type: 'nominal',
-                scale: {},
                 legend: true,
+                scale: false,
+              },
+              fill: {
+                field: 'snapshot',
+                type: 'nominal',
+                scale: {
+                  type: 'ordinal',
+                  domain: ['Current', 'Last year'],
+                  range: [true, false],
+                },
+                legend: false,
+              },
+              strokeDasharray: {
+                field: 'snapshot',
+                type: 'nominal',
+                scale: {
+                  type: 'ordinal',
+                  domain: ['Current', 'Last year'],
+                  range: [null, '4 4'],
+                },
+                legend: false,
               },
             },
           },
@@ -51,7 +71,7 @@ export default [
         }}
       />,
     ],
-    storyName: 'Basic',
+    storyName: 'with time shift',
     storyPath: 'preset-chart-xy|LineChartPlugin',
   },
 ];

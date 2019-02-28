@@ -9,11 +9,11 @@ export default function transformProps(chartProps) {
 
   return {
     data: payload.data.map(({ key, values }) => {
-      const fields = { name: key[0] };
+      const keys = { name: key[0] };
 
       return {
         seriesKey: key.join('/'),
-        fields,
+        keys,
         values: values.map(v => ({
           ...v,
           // y: Math.random() < 0.1 ? null : v.y,
@@ -25,6 +25,7 @@ export default function transformProps(chartProps) {
     encoding: {
       x: {
         field: 'x',
+        type: 'temporal',
         scale: {
           type: 'time',
         },
@@ -37,6 +38,7 @@ export default function transformProps(chartProps) {
       },
       y: {
         field: 'y',
+        type: 'quantitative',
         scale: {
           type: 'linear',
         },
@@ -47,7 +49,8 @@ export default function transformProps(chartProps) {
         },
       },
       color: {
-        field: 'fields.name',
+        field: 'name',
+        type: 'nominal',
         scale: {
           scheme: colorScheme,
         },

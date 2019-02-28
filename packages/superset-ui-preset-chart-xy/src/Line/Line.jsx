@@ -29,12 +29,12 @@ import {
 } from '@data-ui/xy-chart';
 import { themeShape } from '@data-ui/xy-chart/esm/utils/propShapes';
 import { chartTheme } from '@data-ui/theme';
-import { CategoricalColorNamespace } from '@superset-ui/color';
-import { flatMap, get, uniqueId } from 'lodash';
+import { flatMap, uniqueId } from 'lodash';
 import createTooltip from './createTooltip';
 import renderLegend from '../utils/renderLegend';
 import XYChartLayout from '../utils/XYChartLayout';
 import WithLegend from '../components/WithLegend';
+import Encoder from '../utils/Encoder';
 
 chartTheme.gridStyles.stroke = '#f1f3f5';
 
@@ -87,18 +87,14 @@ class LineChart extends React.PureComponent {
       encoding,
     };
 
-    const colorFn = CategoricalColorNamespace.getScale(
-      encoding.color.scale.scheme,
-      encoding.color.scale.namespace,
-    );
-
     const encodedData = data.map(series => {
-      const color = colorFn(get(series, encoding.color.field));
+      const color = this.encoder.encode(series.keys, 'color');
 
       return {
         ...series,
         color,
-        fill: false,
+        fill: this.encoder.encode(series.keys, 'fill', false),
+        strokeDasharray: this.encoder.encode(series.keys, 'strokeDasharray'),
         values: series.values.map(v => ({
           ...v,
           color,
@@ -125,6 +121,7 @@ class LineChart extends React.PureComponent {
               interpolation="linear"
               fill={`url(#${gradientId})`}
               stroke={series.color}
+              strokeWidth={1.5}
             />,
           ];
         }),
@@ -188,15 +185,22 @@ class LineChart extends React.PureComponent {
   render() {
     const { className, data, width, height, encoding } = this.props;
 
+    this.encoder = new Encoder(
+      {
+        encoding,
+      },
+      data,
+    );
+
     return (
       <WithLegend
         className={`superset-chart-line ${className}`}
         width={width}
         height={height}
         position="top"
-        renderLegend={() => renderLegend(data, encoding.color)}
+        renderLegend={() => renderLegend(data, this.encoder)}
         renderChart={parent => this.renderChart(parent)}
-        hideLegend={!encoding.color.legend}
+        hideLegend={this.encoder.legends.length === 0}
       />
     );
   }
