@@ -1,4 +1,4 @@
-/* eslint-disable no-magic-numbers */
+/* eslint-disable no-magic-numbers, sort-keys */
 import React from 'react';
 import { SuperChart } from '@superset-ui/chart';
 import data from './data';
@@ -8,62 +8,51 @@ export default [
     renderStory: () => [
       <SuperChart
         key="line1"
-        chartType="line2"
+        chartType="v2-line"
         chartProps={{
           datasource: { verboseMap: {} },
           formData: {
-            bottomMargin: 'auto',
-            colorScheme: 'd3Category10',
-            leftMargin: 'auto',
-            lineInterpolation: 'linear',
-            richTooltip: true,
-            showBrush: 'auto',
-            showLegend: true,
-            showMarkers: false,
-            vizType: 'line',
-            xAxisFormat: '%Y',
-            xAxisLabel: '',
-            xAxisShowminmax: false,
-            xTicksLayout: 'auto',
-            yAxisBounds: [null, null],
-            yAxisFormat: '',
-            yAxisLabel: '',
-            yAxisShowminmax: false,
-            yLogScale: false,
+            encoding: {
+              x: {
+                field: 'x',
+                scale: {
+                  type: 'time',
+                },
+                axis: {
+                  orientation: 'bottom',
+                  label: 'Time',
+                  // numTicks: 5,
+                  tickFormat: '%Y',
+                },
+              },
+              y: {
+                field: 'y',
+                scale: {
+                  type: 'linear',
+                },
+                axis: {
+                  orientation: 'left',
+                  label: 'Score',
+                },
+              },
+              color: {
+                field: 'fields.name',
+                scale: {},
+                legend: true,
+              },
+              strokeDashArray: {
+                field: 'fields.timeOffset',
+                scale: {
+                  type: 'ordinal',
+                  domain: ['now', 'last year'],
+                  range: ['4 4', ''],
+                },
+              },
+            },
           },
           height: 400,
           payload: { data },
           width: 400,
-        }}
-      />,
-      <SuperChart
-        key="line2"
-        chartType="line2"
-        chartProps={{
-          datasource: { verboseMap: {} },
-          formData: {
-            bottomMargin: 'auto',
-            colorScheme: 'd3Category10',
-            leftMargin: 'auto',
-            lineInterpolation: 'linear',
-            richTooltip: true,
-            showBrush: 'auto',
-            showLegend: true,
-            showMarkers: false,
-            vizType: 'line',
-            xAxisFormat: '%Y-%m',
-            xAxisLabel: '',
-            xAxisShowminmax: false,
-            xTicksLayout: 'auto',
-            yAxisBounds: [null, null],
-            yAxisFormat: '',
-            yAxisLabel: '',
-            yAxisShowminmax: false,
-            yLogScale: false,
-          },
-          height: 400,
-          payload: { data },
-          width: 800,
         }}
       />,
     ],

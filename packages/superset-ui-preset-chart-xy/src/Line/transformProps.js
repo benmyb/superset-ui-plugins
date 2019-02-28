@@ -5,7 +5,11 @@ import { getTimeFormatter } from '@superset-ui/time-format';
 
 export default function transformProps(chartProps) {
   const { width, height, formData, payload } = chartProps;
-  const { colorScheme, xAxisLabel, xAxisFormat, yAxisLabel, yAxisFormat } = formData;
+  const { encoding } = formData;
+
+  // hack
+  encoding.x.axis.tickFormat = getTimeFormatter(encoding.x.axis.tickFormat);
+  encoding.y.axis.tickFormat = getNumberFormatter(encoding.y.axis.tickFormat);
 
   return {
     data: payload.data.map(({ key, values }) => {
@@ -22,37 +26,6 @@ export default function transformProps(chartProps) {
     }),
     width,
     height,
-    encoding: {
-      x: {
-        field: 'x',
-        scale: {
-          type: 'time',
-        },
-        axis: {
-          orientation: 'bottom',
-          label: xAxisLabel,
-          // numTicks: 5,
-          tickFormat: getTimeFormatter(xAxisFormat),
-        },
-      },
-      y: {
-        field: 'y',
-        scale: {
-          type: 'linear',
-        },
-        axis: {
-          orientation: 'left',
-          label: yAxisLabel,
-          tickFormat: getNumberFormatter(yAxisFormat),
-        },
-      },
-      color: {
-        field: 'fields.name',
-        scale: {
-          scheme: colorScheme,
-        },
-        legend: true,
-      },
-    },
+    encoding,
   };
 }

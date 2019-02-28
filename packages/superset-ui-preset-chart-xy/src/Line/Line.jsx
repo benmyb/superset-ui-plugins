@@ -98,7 +98,7 @@ class LineChart extends React.PureComponent {
       return {
         ...series,
         color,
-        fill: series.fields.name === 'David',
+        fill: false,
         values: series.values.map(v => ({
           ...v,
           color,
@@ -122,6 +122,7 @@ class LineChart extends React.PureComponent {
             <AreaSeries
               key={`${series.seriesKey}-fill`}
               data={series.values}
+              interpolation="linear"
               fill={`url(#${gradientId})`}
               stroke={series.color}
             />,
@@ -133,6 +134,7 @@ class LineChart extends React.PureComponent {
           key={series.seriesKey}
           seriesKey={series.seriesKey}
           animated
+          interpolation="linear"
           data={series.values}
           stroke={series.color}
           strokeDasharray={series.strokeDasharray}
