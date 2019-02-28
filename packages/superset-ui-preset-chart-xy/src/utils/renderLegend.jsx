@@ -5,7 +5,7 @@ import { scaleOrdinal } from '@vx/scale';
 export default function renderLegend(data, encoder) {
   const keySet = new Set();
   data.forEach(d => {
-    keySet.add(encoder.accessors.color(d.keys));
+    keySet.add(encoder.accessors.color(d.keys ? d.keys : d));
   });
   const keys = [...keySet.values()];
   const colorScale = scaleOrdinal({

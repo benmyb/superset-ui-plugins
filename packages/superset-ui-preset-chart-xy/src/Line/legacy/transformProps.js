@@ -1,6 +1,3 @@
-import { getNumberFormatter } from '@superset-ui/number-format';
-import { getTimeFormatter } from '@superset-ui/time-format';
-
 /* eslint-disable sort-keys */
 
 export default function transformProps(chartProps) {
@@ -8,18 +5,10 @@ export default function transformProps(chartProps) {
   const { colorScheme, xAxisLabel, xAxisFormat, yAxisLabel, yAxisFormat } = formData;
 
   return {
-    data: payload.data.map(({ key, values }) => {
-      const keys = { name: key[0] };
-
-      return {
-        seriesKey: key.join('/'),
-        keys,
-        values: values.map(v => ({
-          ...v,
-          // y: Math.random() < 0.1 ? null : v.y,
-        })),
-      };
-    }),
+    data: payload.data.map(({ key, values }) => ({
+      keys: { name: key[0] },
+      values,
+    })),
     width,
     height,
     encoding: {
@@ -33,7 +22,7 @@ export default function transformProps(chartProps) {
           orientation: 'bottom',
           label: xAxisLabel,
           // numTicks: 5,
-          tickFormat: getTimeFormatter(xAxisFormat),
+          tickFormat: xAxisFormat,
         },
       },
       y: {
@@ -45,7 +34,7 @@ export default function transformProps(chartProps) {
         axis: {
           orientation: 'left',
           label: yAxisLabel,
-          tickFormat: getNumberFormatter(yAxisFormat),
+          tickFormat: yAxisFormat,
         },
       },
       color: {

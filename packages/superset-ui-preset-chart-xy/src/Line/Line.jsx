@@ -77,46 +77,49 @@ class LineChart extends React.PureComponent {
   renderChart({ width, height }) {
     const { data, encoding, margin, theme } = this.props;
 
-    const spec = {
-      width,
-      height,
-      minContentWidth: 0,
-      minContentHeight: 0,
-      margin,
-      theme,
-      encoding,
-    };
+    const keySet = new Set();
+    if (data && data.length > 0) {
+      data.forEach(({ keys }) => {
+        Object.keys(keys).forEach(k => {
+          keySet.add(k);
+        });
+      });
+    }
+    const fieldNames = [...keySet.values()].sort((a, b) => a.localeCompare(b));
 
     const encodedData = data.map(series => {
       const color = this.encoder.encode(series.keys, 'color');
 
-      return {
+      const encodedSeries = {
         ...series,
+        key: fieldNames.map(f => series.keys[f]).join('/'),
         color,
         fill: this.encoder.encode(series.keys, 'fill', false),
         strokeDasharray: this.encoder.encode(series.keys, 'strokeDasharray'),
-        values: series.values.map(v => ({
-          ...v,
-          color,
-        })),
       };
+      encodedSeries.values = series.values.map(v => ({
+        ...v,
+        parent: encodedSeries,
+      }));
+
+      return encodedSeries;
     });
 
     const children = flatMap(
       encodedData
         .filter(series => series.fill)
         .map(series => {
-          const gradientId = uniqueId(`gradient-${series.seriesKey}`);
+          const gradientId = uniqueId(`gradient-${series.key}`);
 
           return [
             <LinearGradient
-              key={`${series.seriesKey}-gradient`}
+              key={`${series.key}-gradient`}
               id={gradientId}
               from={series.color}
               to="#fff"
             />,
             <AreaSeries
-              key={`${series.seriesKey}-fill`}
+              key={`${series.key}-fill`}
               data={series.values}
               interpolation="linear"
               fill={`url(#${gradientId})`}
@@ -128,8 +131,8 @@ class LineChart extends React.PureComponent {
     ).concat(
       encodedData.map(series => (
         <LineSeries
-          key={series.seriesKey}
-          seriesKey={series.seriesKey}
+          key={series.key}
+          seriesKey={series.key}
           animated
           interpolation="linear"
           data={series.values}
@@ -139,6 +142,16 @@ class LineChart extends React.PureComponent {
         />
       )),
     );
+
+    const spec = {
+      width,
+      height,
+      minContentWidth: 0,
+      minContentHeight: 0,
+      margin,
+      theme,
+      encoding,
+    };
 
     const layout = new XYChartLayout({ ...spec, children });
 
@@ -168,9 +181,9 @@ class LineChart extends React.PureComponent {
               fullHeight
               strokeDasharray=""
               showHorizontalLine={false}
-              circleFill={d => (d.y === tooltipData.datum.y ? d.color : '#fff')}
+              circleFill={d => (d.y === tooltipData.datum.y ? d.parent.color : '#fff')}
               circleSize={d => (d.y === tooltipData.datum.y ? 6 : 4)}
-              circleStroke={d => (d.y === tooltipData.datum.y ? '#fff' : d.color)}
+              circleStroke={d => (d.y === tooltipData.datum.y ? '#fff' : d.parent.color)}
               circleStyles={{ strokeWidth: 1.5 }}
               stroke="#ccc"
               showCircle
@@ -185,12 +198,7 @@ class LineChart extends React.PureComponent {
   render() {
     const { className, data, width, height, encoding } = this.props;
 
-    this.encoder = new Encoder(
-      {
-        encoding,
-      },
-      data,
-    );
+    this.encoder = new Encoder(encoding);
 
     return (
       <WithLegend
@@ -200,7 +208,7 @@ class LineChart extends React.PureComponent {
         position="top"
         renderLegend={() => renderLegend(data, this.encoder)}
         renderChart={parent => this.renderChart(parent)}
-        hideLegend={this.encoder.legends.length === 0}
+        hideLegend={!this.encoder.hasLegend()}
       />
     );
   }

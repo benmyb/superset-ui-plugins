@@ -31,16 +31,16 @@ export default function createTooltip(spec, data) {
         {series && (
           <TooltipTable
             data={data
-              .filter(({ seriesKey }) => series[seriesKey])
+              .filter(({ key }) => series[key])
               .concat()
-              .sort((a, b) => series[b.seriesKey].y - series[a.seriesKey].y)
-              .map(({ seriesKey, color }) => ({
-                key: seriesKey,
+              .sort((a, b) => series[b.key].y - series[a.key].y)
+              .map(({ key, color }) => ({
+                key,
                 keyStyle: {
                   color,
-                  fontWeight: series[seriesKey] === datum ? 600 : 200,
+                  fontWeight: series[key] === datum ? 600 : 200,
                 },
-                value: spec.encoding.y.axis.tickFormat(series[seriesKey].y),
+                value: spec.encoding.y.axis.tickFormat(series[key].y),
               }))}
           />
         )}
