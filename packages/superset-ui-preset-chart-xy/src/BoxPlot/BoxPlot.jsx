@@ -22,11 +22,11 @@ import React from 'react';
 import { BoxPlotSeries, XYChart } from '@data-ui/xy-chart';
 import { themeShape } from '@data-ui/xy-chart/esm/utils/propShapes';
 import { chartTheme } from '@data-ui/theme';
-import { CategoricalColorNamespace } from '@superset-ui/color';
 import createTooltip from './createTooltip';
 import renderLegend from '../utils/renderLegend';
 import XYChartLayout from '../utils/XYChartLayout';
 import WithLegend from '../components/WithLegend';
+import Encoder from '../utils/Encoder';
 
 chartTheme.gridStyles.stroke = '#f1f3f5';
 
@@ -82,25 +82,18 @@ class BoxPlot extends React.PureComponent {
         : encoding,
     };
 
-    const colorFn = CategoricalColorNamespace.getScale(
-      encoding.color.scale.scheme,
-      encoding.color.scale.namespace,
-    );
-
-    const colorField = encoding.color.field;
-
     const children = [
       <BoxPlotSeries
-        key={datum => datum[encoding.x.field]}
+        key={this.encoder.accessors.x}
         animated
         data={
           isHorizontal
-            ? data.map(row => ({ ...row, y: row[encoding.x.field] }))
-            : data.map(row => ({ ...row, x: row[encoding.x.field] }))
+            ? data.map(row => ({ ...row, y: this.encoder.accessors.x(row) }))
+            : data.map(row => ({ ...row, x: this.encoder.accessors.x(row) }))
         }
-        fill={datum => colorFn(datum[colorField])}
+        fill={datum => this.encoder.encode(datum, 'color')}
         fillOpacity={0.4}
-        stroke={datum => colorFn(datum[colorField])}
+        stroke={datum => this.encoder.encode(datum, 'color')}
         strokeWidth={1}
         widthRatio={0.6}
         horizontal={isHorizontal}
@@ -131,15 +124,17 @@ class BoxPlot extends React.PureComponent {
   render() {
     const { className, data, width, height, encoding } = this.props;
 
+    this.encoder = new Encoder(encoding);
+
     return (
       <WithLegend
         className={`superset-chart-box-plot ${className}`}
         width={width}
         height={height}
         position="top"
-        renderLegend={() => renderLegend(data, encoding.color)}
+        renderLegend={() => renderLegend(data, this.encoder)}
         renderChart={parent => this.renderChart(parent)}
-        hideLegend={!encoding.color.legend}
+        hideLegend={!this.encoder.hasLegend()}
       />
     );
   }

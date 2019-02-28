@@ -56,6 +56,7 @@ export default function transformProps(chartProps) {
     encoding: {
       x: {
         field: 'label',
+        type: 'nominal',
         scale: {
           type: 'band',
           paddingInner: 0.15,
@@ -67,6 +68,7 @@ export default function transformProps(chartProps) {
         },
       },
       y: {
+        type: 'quantitative',
         scale: {
           type: 'linear',
           domain: valueDomain,
@@ -80,6 +82,7 @@ export default function transformProps(chartProps) {
       },
       color: {
         field: 'label',
+        type: 'nominal',
         scale: {
           scheme: colorScheme,
         },

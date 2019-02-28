@@ -13,6 +13,7 @@ export default [
           formData: {
             encoding: {
               x: {
+                type: 'nominal',
                 field: 'label',
                 scale: {
                   type: 'band',
@@ -25,6 +26,7 @@ export default [
                 },
               },
               y: {
+                type: 'quantitative',
                 scale: {
                   type: 'linear',
                 },
@@ -35,6 +37,7 @@ export default [
                 },
               },
               color: {
+                type: 'nominal',
                 field: 'label',
                 scale: {
                   scheme: 'd3Category10',
